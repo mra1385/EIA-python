@@ -189,8 +189,8 @@ class EIA(object):
             for series_id in categories_dict.values():
                 search = requests.get(url_data.format(series_id['Series ID'],
                                                       self.token))
-                lst_dates = [x[0][0:4] + " " + x[0][4:] for x in
-                             search.json()['series'][0]['data']]
+                lst_dates = [x[0][0:4] + " " + x[0][4:6] + " " + x[0][6:8]
+                             for x in search.json()['series'][0]['data']]
                 lst_values = [x[1] for x in
                               search.json()['series'][0]['data']]
                 dates_values_dict = dict(zip(lst_dates, lst_values))
@@ -226,8 +226,8 @@ class EIA(object):
                     error_msg = search.json()['data']['error']
                     raise APIKeyError(error_msg)
                 else:
-                    lst_dates = [x[0][0:4] + " " + x[0][4:] for x in
-                                 search.json()['series'][0]['data']]
+                    lst_dates = [x[0][0:4] + " " + x[0][4:6] + " " + x[0][6:8]
+                                 for x in search.json()['series'][0]['data']]
                     lst_values = [x[1] for x in
                                   search.json()['series'][0]['data']]
                     dates_values_dict = dict(zip(lst_dates, lst_values))
@@ -263,8 +263,8 @@ class EIA(object):
                     error_msg = search.json()['data']['error']
                     raise APIKeyError(error_msg)
                 else:
-                    lst_dates = [x[0][0:4] + " " + x[0][4:] for x in
-                                 search.json()['series'][0]['data']]
+                    lst_dates = [x[0][0:4] + " " + x[0][4:] + " " + x[0][6:8]
+                                 for x in search.json()['series'][0]['data']]
                     lst_values = [x[1] for x in
                                   search.json()['series'][0]['data']]
                     dates_values_dict = dict(zip(lst_dates, lst_values))
@@ -293,8 +293,8 @@ class EIA(object):
             error_msg = search.json()['data']['error']
             raise InvalidSeries(error_msg)
         else:
-            lst_dates = [x[0][0:4] + " " + x[0][4:] for x in
-                         search.json()['series'][0]['data']]
+            lst_dates = [x[0][0:4] + " " + x[0][4:] + " " + x[0][6:8]
+                         for x in search.json()['series'][0]['data']]
             lst_values = [x[1] for x in
                           search.json()['series'][0]['data']]
             dates_values_dict = dict(zip(lst_dates, lst_values))
