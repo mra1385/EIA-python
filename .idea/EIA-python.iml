@@ -5,4 +5,10 @@
     <orderEntry type="jdk" jdkName="Python 3.4.3 virtualenv at C:\Users\MRA\EIA-python-virualenv" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PackageRequirementsSettings">
+    <option name="requirementsPath" value="C:\Users\MRA\EIA-python\requirements" />
+  </component>
+  <component name="TestRunnerService">
+    <option name="PROJECT_TEST_RUNNER" value="Unittests" />
+  </component>
 </module>
