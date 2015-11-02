@@ -5,7 +5,7 @@ A Python 2/3 wrapper for the Energy Information Agency (EIA) API.
 Installation
 -----
 ```
-Clone/download the repository and run 'python setup.py install' from the module directory.
+Pip install EIA_python.
 ```
 Requires
 -----
