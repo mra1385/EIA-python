@@ -1,6 +1,6 @@
 EIA-python
 ======
-A Python 2/3 client for the Energy Information Agency (EIA) API
+A Python 2/3 wrapper for the Energy Information Agency (EIA) API.
 
 Installation
 -----
