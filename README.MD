@@ -52,7 +52,7 @@ Series Search:
 -----
 
 
-    from EIA_python.EIA import EIA
+    from EIA.EIA_python import EIA
     
     API = "YOUR_API-KEY"
     api = EIA(API)
@@ -98,7 +98,7 @@ Series Search:
 Data Retrieval:
 -----
      
-    from EIA_python.EIA import EIA
+    from EIA.EIA_python import EIA
     import pandas as pd
     
     API = "YOUR_API-KEY"
