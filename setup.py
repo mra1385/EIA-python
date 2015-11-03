@@ -2,11 +2,11 @@ from distutils.core import setup
 
 setup(
     name='EIA-python',
-    version='1.2',
+    version='1.3',
     packages=['EIA'],
     url='https://github.com/mra1385/EIA-python',
     license='BSD',
     author='Mike Azar',
     author_email='mikeazar@gmail.com',
-    description='Python Wrapper for EIA API'
+    description='Python Wrapper for Energy Information Administration API'
 )
