@@ -77,7 +77,7 @@ class EIA(object):
                            return_list=False):
         """
         API Category Query
-        :param category: string or int
+        :param filters_to_keep: sting or int or list of strings or ints
         :param filters_to_keep: list or string
         :param filters_to_remove: list or string
         :param return_list: boolean
@@ -231,7 +231,7 @@ class EIA(object):
         """
         API Category Query
         :param category: string or list
-        :param filters_to_keep: sting or list
+        :param filters_to_keep: sting or int or list of strings or ints
         :param filters_to_remove: string or list
         :return: Returns EIA data series in dictionary form
         (name, units, frequency, and series ID) based on category ID.
@@ -242,14 +242,18 @@ class EIA(object):
         url_data = 'http://api.eia.gov/series/?series_id={}&api_key={}&out=json'
         values_dict = {}
         if categories_dict is not None:
-            for series_id in categories_dict.values():
-                search = requests.get(url_data.format(series_id['Series ID'],
-                                                      self.token))
+            for series_id in categories_dict.keys():
+                search = requests.get(url_data.format(
+                    categories_dict[series_id]['Series ID'],
+                    self.token))
 
                 if ('error' in str(search.json().items())) and \
                         (search.json()['data']['error'].find(
                             'invalid series_id') != -1):
-                    values_dict[series_id['Series ID']] = "No Data Available"
+                    values_dict[series_id + " (" +
+                                categories_dict[series_id]['Units'] +
+                                ") "] = \
+                        "No Data Available"
 
                 else:
                     lst_dates = [x[0][0:4] + " " + x[0][4:6] + " " + x[0][6:8]
@@ -293,10 +297,10 @@ class EIA(object):
         values_dict = {}
 
         if categories_dict is not None:
-            for series_id in categories_dict.values():
-
-                search = requests.get(url_data.format(series_id['Series ID'],
-                                                      self.token))
+            for series_id in categories_dict.keys():
+                search = requests.get(url_data.format(
+                    categories_dict[series_id]['Series ID'],
+                    self.token))
 
                 if ('error' in str(search.json().items())) and \
                         (search.json()['data']['error'].find(
@@ -307,7 +311,10 @@ class EIA(object):
                 elif ('error' in str(search.json().items())) and \
                         (search.json()['data']['error'].find(
                             'invalid series_id') != -1):
-                    values_dict[series_id['Series ID']] = "No Data Available"
+                    values_dict[series_id + " (" +
+                                categories_dict[series_id]['Units'] +
+                                ") "] = \
+                        "No Data Available"
 
                 else:
                     lst_dates = [x[0][0:4] + " " + x[0][4:6] + " " + x[0][6:8]
@@ -349,9 +356,11 @@ class EIA(object):
         url_data = 'http://api.eia.gov/series/?series_id={}&api_key={}&out=json'
         values_dict = {}
         if categories_dict is not None:
-            for series_id in categories_dict.values():
-                search = requests.get(url_data.format(series_id['Series ID'],
-                                                      self.token))
+            for series_id in categories_dict.keys():
+                search = requests.get(url_data.format(
+                    categories_dict[series_id]['Series ID'],
+                    self.token))
+
                 if ('error' in str(search.json().items())) and \
                         (search.json()['data']['error'].find(
                             'invalid or missing api_key') != -1):
@@ -361,10 +370,13 @@ class EIA(object):
                 elif ('error' in str(search.json().items())) and \
                         (search.json()['data']['error'].find(
                             'invalid series_id') != -1):
-                    values_dict[series_id['Series ID']] = "No Data Available"
+                    values_dict[series_id + " (" +
+                                categories_dict[series_id]['Units'] +
+                                ") "] = \
+                        "No Data Available"
 
                 else:
-                    lst_dates = [x[0][0:4] + " " + x[0][4:] + " " + x[0][6:8]
+                    lst_dates = [x[0][0:4] + " " + x[0][4:6] + " " + x[0][6:8]
                                  for x in search.json()['series'][0]['data']]
                     lst_values = [x[1] for x in
                                   search.json()['series'][0]['data']]
@@ -374,6 +386,7 @@ class EIA(object):
                                 search.json()['series'][0]['units'] +
                                 ")"] = \
                         dates_values_dict
+
             return values_dict
 
         elif categories_dict is None:
