@@ -2,9 +2,10 @@ from distutils.core import setup
 
 setup(
     name='EIA_python',
-    version='1.0',
+    version='1.1',
     packages=['EIA', 'build.lib.EIA'],
     url='https://github.com/mra1385/EIA-python',
+    download_url = 'https://github.com/mra1385/EIA-python',
     license='BSD',
     author='Mike Azar',
     author_email='mikeazar@gmail.com',
