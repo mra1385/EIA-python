@@ -54,6 +54,7 @@ class EIA(object):
                             continue
                     else:
                         continue
+
         if filters_to_remove is not None:
             if type(filters_to_remove) == str:
                 filters_to_remove = filters_to_remove.split()
@@ -114,6 +115,7 @@ class EIA(object):
             for k in categories_dict:
                 categories_lst.append(k)
             return categories_lst
+
         else:
             return categories_dict
 
@@ -142,6 +144,7 @@ class EIA(object):
                      'search_value="{}"&rows_per_page={}&page_num={}'
         categories_dict = {}
         search = requests.get(search_url.format(keyword, rows, page))
+
         if ('response' in str(search.json())) and \
                 (len(search.json()['response']['docs']) > 0):
             for k in search.json()['response']['docs']:
@@ -163,6 +166,7 @@ class EIA(object):
             for k, v in categories_dict.items():
                 categories_lst.append(k)
             return categories_lst
+
         else:
             return categories_dict
 
@@ -191,11 +195,13 @@ class EIA(object):
         search = requests.get(search_url.format(date, rows, page))
         if ('response' in str(search.json()) and
                 (len(search.json()['response']['docs']) > 0)):
+
             for k in search.json()['response']['docs']:
                 categories_dict[k['name']] = {}
                 categories_dict[k['name']]['Units'] = k['units']
                 categories_dict[k['name']]['Frequency'] = k['frequency']
                 categories_dict[k['name']]['Series ID'] = k['series_id']
+
             if filters_to_keep is not None or filters_to_remove is not None:
                 categories_dict = self._filter_categories(categories_dict,
                                                           filters_to_keep,
@@ -205,6 +211,7 @@ class EIA(object):
                 for k in categories_dict:
                     categories_lst.append(k)
                 return categories_lst
+
             else:
                 return categories_dict
 
@@ -213,6 +220,7 @@ class EIA(object):
                                   "Date should be in the following format:"
                                   "'2015-01-01T00:00:00Z TO "
                                   "2015-01-01T23:59:59Z'")
+
         elif len(search.json()['response']['docs']) == 0:
             raise NoResultsError('No Results Found')
 
@@ -237,17 +245,26 @@ class EIA(object):
             for series_id in categories_dict.values():
                 search = requests.get(url_data.format(series_id['Series ID'],
                                                       self.token))
-                lst_dates = [x[0][0:4] + " " + x[0][4:6] + " " + x[0][6:8]
-                             for x in search.json()['series'][0]['data']]
-                lst_values = [x[1] for x in
-                              search.json()['series'][0]['data']]
-                dates_values_dict = dict(zip(lst_dates, lst_values))
-                values_dict[search.json()['series'][0]['name'] +
-                            " (" +
-                            search.json()['series'][0]['units'] +
-                            ")"] = \
-                    dates_values_dict
+
+                if ('error' in str(search.json().items())) and \
+                        (search.json()['data']['error'].find(
+                            'invalid series_id') != -1):
+                    values_dict[series_id['Series ID']] = "No Data Available"
+
+                else:
+                    lst_dates = [x[0][0:4] + " " + x[0][4:6] + " " + x[0][6:8]
+                                 for x in search.json()['series'][0]['data']]
+                    lst_values = [x[1] for x in
+                                  search.json()['series'][0]['data']]
+                    dates_values_dict = dict(zip(lst_dates, lst_values))
+                    values_dict[search.json()['series'][0]['name'] +
+                                " (" +
+                                search.json()['series'][0]['units'] +
+                                ")"] = \
+                        dates_values_dict
+
             return values_dict
+
         else:
             raise NoResultsError('No Results Found')
 
@@ -274,15 +291,24 @@ class EIA(object):
                                                  page)
         url_data = 'http://api.eia.gov/series/?series_id={}&api_key={}&out=json'
         values_dict = {}
+
         if categories_dict is not None:
             for series_id in categories_dict.values():
+
                 search = requests.get(url_data.format(series_id['Series ID'],
                                                       self.token))
+
                 if ('error' in str(search.json().items())) and \
                         (search.json()['data']['error'].find(
                             'invalid or missing api_key') != -1):
                     error_msg = search.json()['data']['error']
                     raise APIKeyError(error_msg)
+
+                elif ('error' in str(search.json().items())) and \
+                        (search.json()['data']['error'].find(
+                            'invalid series_id') != -1):
+                    values_dict[series_id['Series ID']] = "No Data Available"
+
                 else:
                     lst_dates = [x[0][0:4] + " " + x[0][4:6] + " " + x[0][6:8]
                                  for x in search.json()['series'][0]['data']]
@@ -295,6 +321,7 @@ class EIA(object):
                                 ")"] = \
                         dates_values_dict
             return values_dict
+
         elif categories_dict is None:
             raise NoResultsError("No Results Found")
 
@@ -330,6 +357,12 @@ class EIA(object):
                             'invalid or missing api_key') != -1):
                     error_msg = search.json()['data']['error']
                     raise APIKeyError(error_msg)
+
+                elif ('error' in str(search.json().items())) and \
+                        (search.json()['data']['error'].find(
+                            'invalid series_id') != -1):
+                    values_dict[series_id['Series ID']] = "No Data Available"
+
                 else:
                     lst_dates = [x[0][0:4] + " " + x[0][4:] + " " + x[0][6:8]
                                  for x in search.json()['series'][0]['data']]
@@ -342,6 +375,7 @@ class EIA(object):
                                 ")"] = \
                         dates_values_dict
             return values_dict
+
         elif categories_dict is None:
             raise NoResultsError("No Results Found")
 
@@ -356,16 +390,19 @@ class EIA(object):
         url_data = 'http://api.eia.gov/series/?series_id={}&api_key={}&out=json'
         values_dict = {}
         search = requests.get(url_data.format(series, self.token))
+
         if ('error' in str(search.json().items())) and \
                 (search.json()['data']['error'].find(
                     'invalid or missing api_key') != -1):
             error_msg = search.json()['data']['error']
             raise APIKeyError(error_msg)
+
         elif ('error' in str(search.json().items())) and \
                 (search.json()['data']['error'].find(
                     'invalid series_id') != -1):
             error_msg = search.json()['data']['error']
             raise InvalidSeries(error_msg)
+
         else:
             lst_dates = [x[0][0:4] + " " + x[0][4:] + " " + x[0][6:8]
                          for x in search.json()['series'][0]['data']]
