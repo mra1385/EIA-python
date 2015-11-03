@@ -24,16 +24,107 @@ The EIA API uses an API key for authentication. Obtain an EIA API key by registe
 the [EIA website](http://www.eia.gov/beta/api/register.cfm).
 
 
-Search methods:
+Series Search:
 -----
 
-[]
+
+    from EIA_python.EIA import EIA
+    
+    API = "YOUR_API-KEY"
+    api = EIA(API)
+    
+    ### Search By Keyword ###
+    # set return_list to True if you only want a list of data series names
+    keyword_search = api.search_by_keyword(keyword=['crude oil', 'price'],
+                                           filters_to_keep=['AEO2015'],
+                                           filters_to_remove=['high price'],
+                                           rows=1000, 
+                                           page=1,
+                                           return_list=False)
+    
+    for key, value in keyword_search.items():
+        print(key, value)
+
+
+    ### Search By Category ID ###
+    # set return_list to True if you only want a list of data series names
+    category_search = api.search_by_category(category=2,
+                                             filters_to_keep=['Alabama'],
+                                             filters_to_remove=['quarterly'],
+                                             return_list=False)
+    
+    for key, value in category_search.items():
+        print(key, value)
+
+
+    ### Search By Date Last Updated ###
+    # set return_list to True if you only want a list of data series names
+    date_search = api.search_by_date(date='2014-01-01T00:00:00Z TO 
+                                           2015-01-01T23:59:59Z',
+                                     filters_to_keep=['Arkansas'],
+                                     filters_to_remove=['annual'],
+                                     rows=1000, 
+                                     page=1,
+                                     return_list=True)
+    
+    for result in date_search:
+        print(result)
 
 
 Data Retrieval:
 -----
+     
+    from EIA_python.EIA import EIA
+    import pandas as pd
+    
+    API = "YOUR_API-KEY"
+    api = EIA(API)
+    
+    ### Retrieve Data By Keyword ###
+    keyword_search = api.data_by_keyword(keyword=['crude oil', 'price'],
+                                         filters_to_keep=['brent'],
+                                         filters_to_remove=['AEO2015'],
+                                         rows=1000, 
+                                         page=1)
+    
+    for key,value in keyword_search.items():
+        print(key,value)
 
-[]
+    df = pd.DataFrame(keyword_search)
+
+    ### Retrieve Data by Category ID ###
+    category_search = api.data_by_keyword(category=2,
+                                          filters_to_keep=['brent'],
+                                          filters_to_remove=['AEO2015'])
+    
+    for key,value in category_search.items():
+        print(key,value)
+
+    df = pd.DataFrame(category_search)
+
+
+    ### Retrieve Data By Date Last Updated ###
+    date_search = api.data_by_date(date='2015-01-01T00:00:00Z 
+                                              TO 2015-01-01T23:59:59Z',
+                                   filters_to_keep=['brent'],
+                                   filters_to_remove=['AEO2015'],
+                                   rows=1000, 
+                                   page=1)
+
+    for key,value in date_search.items():
+        print(key,value)
+
+    df = pd.DataFrame(date_search)
+
+
+    ### Retrieve Data By Series ID ###
+    series_search = api.data_by_series(series='ELEC.GEN.ALL-AL-99.A')
+    
+    for key,value in series_search.items():
+        print(key,value)
+
+    df = pd.DataFrame(series_search)
+
 
 Submitting an Issue
 -------------------

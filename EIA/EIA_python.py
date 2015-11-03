@@ -70,13 +70,13 @@ class EIA(object):
         return filtered_dict
 
     def search_by_category(self,
-                           category_id=None,
+                           category=None,
                            filters_to_keep=None,
                            filters_to_remove=None,
                            return_list=False):
         """
         API Category Query
-        :param category_id: string or int
+        :param category: string or int
         :param filters_to_keep: list or string
         :param filters_to_remove: list or string
         :param return_list: boolean
@@ -86,7 +86,7 @@ class EIA(object):
         """
         search_url = 'http://api.eia.gov/category/?api_key={}&category_id={}'
         categories_dict = {}
-        search = requests.get(search_url.format(self.token, category_id))
+        search = requests.get(search_url.format(self.token, category))
         if ('data' in str(search.json().items())) and \
                 (search.json()['data']['error'].find(
                     'invalid or missing api_key') != -1):
