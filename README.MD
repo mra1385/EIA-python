@@ -24,6 +24,30 @@ The EIA API uses an API key for authentication. Obtain an EIA API key by registe
 the [EIA website](http://www.eia.gov/beta/api/register.cfm).
 
 
+Examples:
+-----
+
+The next two sections, titled "Series Search" and "Data Retrieval" contain 
+examples of how to use the EIA-python module. The module is generally split into
+"Series Search" methods, to help the user find the desired EIA data sets, and
+"Data Retrieval" methods, to help the user actually acquire the data.
+
+"Series Search" methods are wrappers around the EIA API for searching for series 
+using category IDs (API Category Query), keywords (API Search Data Query - 
+Keyword Search / Pagination on Search / Manipulate Rows Per Page) or dates last 
+updated (API Search Data Query - Date Search). These methods help the user
+find specific series or groups of series from within the EIA data set. The 
+intention is that once the desired series are found using the "Series Search" 
+methods (which may require a few runs and tweaks of search parameters), 
+the actual data can then be queried using the "Data Retrieval" methods described 
+below.
+
+"Data Retrieval" methods are wrappers around the EIA API Series Query using 
+category IDs, keywords, dates or series ID. The parameters are all the exact 
+same as for the analogue "Series Search" methods, except for the "return_list"
+parameter, which is a parameter for the "Data Retrieval" methods.
+
+
 Series Search:
 -----
 
