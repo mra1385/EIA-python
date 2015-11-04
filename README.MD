@@ -6,7 +6,7 @@ return data formatted for easy loading into pandas DataFrame objects.
 Installation
 -----
 ```
-Pip install EIA_python.
+pip install EIA_python.
 ```
 Requires
 -----
@@ -46,20 +46,21 @@ below.
 "Data Retrieval" methods are wrappers around the EIA API Series Query using 
 category IDs, keywords, dates or series ID. The parameters are all the exact 
 same as for the analogue "Series Search" methods, except for the "return_list"
-parameter, which is a parameter for the "Data Retrieval" methods.
+parameter, which is NOT a parameter for the "Data Retrieval" methods.
 
 
 Series Search:
 -----
 
-
-    from EIA.EIA_python import EIA
+    import eia
     
-    API = "YOUR_API-KEY"
-    api = EIA(API)
+    api_key = "YOUR_API-KEY"
+    api = eia.API(api_key)
     
     ### Search By Keyword ###
-    # set return_list to True if you only want a list of data series names
+    # set return_list to True if you only want a list of data series names.
+    # filters_to_keep and filters_to_remove filter the search results, and 
+    # keep or delete, respectively, search results which contain filtered words.
     keyword_search = api.search_by_keyword(keyword=['crude oil', 'price'],
                                            filters_to_keep=['AEO2015'],
                                            filters_to_remove=['high price'],
@@ -97,11 +98,11 @@ Series Search:
 Data Retrieval:
 -----
      
-    from EIA.EIA_python import EIA
+    import eia
     import pandas as pd
     
-    API = "YOUR_API-KEY"
-    api = EIA(API)
+    api_key = "YOUR_API-KEY"
+    api = eia.API(api_key)
     
     ### Retrieve Data By Keyword ###
     keyword_search = api.data_by_keyword(keyword=['crude oil', 'price'],
@@ -149,24 +150,9 @@ Data Retrieval:
 
 Submitting an Issue
 -------------------
-We use the [GitHub issue tracker](https://github.com/mra1385/EIA-python/issues) to track bugs and
-features. Before submitting a bug report or feature request, check to make sure it hasn't already
-been submitted. You can indicate support for an existing issue by voting it up. When submitting a
-bug report, please include a [Gist](http://gist.github.com/) that includes a stack trace and any
-details that may be necessary to reproduce the bug, including your version number, and
-operating system. Ideally, a bug report should include a pull request with failing specs.
+Please feel free to contact me if you discover a bug or have an idea for 
+improved functionality.
 
-
-Submitting a Pull Request
--------------------------
-1. Fork the project.
-2. Create a topic branch.
-3. Implement your feature or bug fix.
-4. Run <tt>python tests.py </tt>.
-5. Add a test for your feature or bug fix.
-6. Run <tt>python tests.py </tt>. If your changes are not 100% covered, go back to step 5.
-7. Commit and push your changes.
-8. Submit a pull request.
 
 
 Copyright
