@@ -1,14 +1,27 @@
 import requests
 
 
-# global variable
-globrow = 100
+# global variable for default row count parameter
+glob_row = 100
+
+# global variables with error messages from eia API
+glob_invalid_series_id = 'invalid series_id. For key registration, documentation, ' \
+                    'and examples see http://www.eia.gov/developer/'
+
+glob_invalid_api_key = 'invalid or missing api_key. For key registration, ' \
+                  'documentation, and examples see ' \
+                  'http://www.eia.gov/developer/'
+
 
 class APIKeyError(Exception):
     pass
 
 
 class NoResultsError(Exception):
+    pass
+
+
+class BroadCategory(Exception):
     pass
 
 
@@ -24,12 +37,12 @@ class UndefinedError(Exception):
     pass
 
 
-class EIA(object):
+class API(object):
     def __init__(self, token):
         """
-        Initialise the EIA object:
+        Initialise the eia object:
         :param token: string
-        :return: EIA object
+        :return: eia object
         """
         self.token = token
 
@@ -44,7 +57,7 @@ class EIA(object):
         """
         filtered_dict = dict(d)
         if filters_to_keep is not None:
-            if type(filters_to_keep) == str:
+            if isinstance(filters_to_keep, str):
                 filters_to_keep = filters_to_keep.split()
             for word in filters_to_keep:
                 for key, values in d.items():
@@ -58,7 +71,7 @@ class EIA(object):
                         continue
 
         if filters_to_remove is not None:
-            if type(filters_to_remove) == str:
+            if isinstance(filters_to_remove, str):
                 filters_to_remove = filters_to_remove.split()
             for word in filters_to_remove:
                 for key, values in d.items():
@@ -90,14 +103,12 @@ class EIA(object):
         search_url = 'http://api.eia.gov/category/?api_key={}&category_id={}'
         categories_dict = {}
         search = requests.get(search_url.format(self.token, category))
-        if ('data' in str(search.json().items())) and \
-                (search.json()['data']['error'].find(
-                    'invalid or missing api_key') != -1):
+        if search.json().get('data').get('error') == glob_invalid_api_key:
             error_msg = search.json()['data']['error']
             raise APIKeyError(error_msg)
 
-        elif ('childseries' in str(search.json().items())) and \
-                (len(search.json()['category']['childseries']) > 0):
+        elif (search.json().get('category')) and \
+                (search.json()['category']['childseries']):
             for k in search.json()['category']['childseries']:
                 categories_dict[k['name']] = {}
                 categories_dict[k['name']]['Units'] = k['units']
@@ -108,19 +119,16 @@ class EIA(object):
                                                           filters_to_keep,
                                                           filters_to_remove)
 
-        elif 'No result found' in str(search.json().items()):
-                raise NoResultsError("No Result Found. Try A Different "
-                                     "Category ID")
+        elif search.json().get('data').get('error') == 'No result found.':
+            raise NoResultsError("No Result Found. Try A Different Category ID")
 
-        elif ('childcategories' not in str(search.json().items())) and \
-                (len(search.json()['category']['childcategories']) == 0):
-                raise NoResultsError("No Results Found.")
+        elif (search.json().get('category').get('childcategories')) and \
+                (not search.json().get('category').get('childseries')):
+            raise BroadCategory("Category ID is Too Broad. Try Narrowing "
+                                "Your Search with a Child Category.")
 
-        if return_list is True:
-            categories_lst = []
-            for k in categories_dict:
-                categories_lst.append(k)
-            return categories_lst
+        if return_list:
+            return categories_dict.keys()
 
         else:
             return categories_dict
@@ -129,7 +137,7 @@ class EIA(object):
                           keyword=None,
                           filters_to_keep=None,
                           filters_to_remove=None,
-                          rows=globrow,
+                          rows=glob_row,
                           return_list=False):
         """
         API Search Data Query - Keyword
@@ -142,14 +150,14 @@ class EIA(object):
         (name, units, frequency, and series ID) based on keyword.
         If return_list is true, returns a list of search results (name, only).
         """
-        if type(keyword) == list: keyword = '+'.join(keyword)
+        if isinstance(keyword, list) == list: keyword = '+'.join(keyword)
         search_url = 'http://api.eia.gov/search/?search_term=name&' \
                      'search_value="{}"&rows_per_page={}'
         categories_dict = {}
         search = requests.get(search_url.format(keyword, rows))
 
-        if ('response' in str(search.json())) and \
-                (len(search.json()['response']['docs']) > 0):
+        if (search.json().get('response')) and \
+                (search.json()['response']['docs']):
             for k in search.json()['response']['docs']:
                 categories_dict[k['name']] = {}
                 categories_dict[k['name']]['Units'] = k['units']
@@ -160,15 +168,12 @@ class EIA(object):
                                                           filters_to_keep,
                                                           filters_to_remove)
 
-        elif ('response' in str(search.json())) and \
-                (len(search.json()['response']['docs']) == 0):
+        elif (search.json().get('response')) and \
+                (not search.json()['response']['docs']):
             raise NoResultsError('No Results Found')
 
-        if return_list is True:
-            categories_lst = []
-            for k, v in categories_dict.items():
-                categories_lst.append(k)
-            return categories_lst
+        if return_list:
+            return categories_dict.keys()
 
         else:
             return categories_dict
@@ -177,7 +182,7 @@ class EIA(object):
                        date,
                        filters_to_keep=None,
                        filters_to_remove=None,
-                       rows=globrow,
+                       rows=glob_row,
                        return_list=False):
         """
         API Search Data Query - Date Search
@@ -194,8 +199,8 @@ class EIA(object):
                      'search_value=[{}]&rows_per_page={}'
         categories_dict = {}
         search = requests.get(search_url.format(date, rows))
-        if ('response' in str(search.json()) and
-                (len(search.json()['response']['docs']) > 0)):
+        if (search.json().get('response')) and \
+                (search.json()['response']['docs']):
 
             for k in search.json()['response']['docs']:
                 categories_dict[k['name']] = {}
@@ -207,22 +212,19 @@ class EIA(object):
                 categories_dict = self._filter_categories(categories_dict,
                                                           filters_to_keep,
                                                           filters_to_remove)
-            if return_list is True:
-                categories_lst = []
-                for k in categories_dict:
-                    categories_lst.append(k)
-                return categories_lst
+            if return_list:
+                return categories_dict.keys()
 
             else:
                 return categories_dict
 
-        elif 'solr connection failed' in str(search.json()):
+        elif search.json().get('error') == 'solr connection failed.':
             raise DateFormatError("Connection Failed. Check date format. "
                                   "Date should be in the following format:"
-                                  "'2015-01-01T00:00:00Z TO "
+                                  "'2014-01-01T00:00:00Z TO "
                                   "2015-01-01T23:59:59Z'")
 
-        elif len(search.json()['response']['docs']) == 0:
+        elif not search.json()['response']['docs']:
             raise NoResultsError('No Results Found')
 
     def data_by_category(self,
@@ -234,7 +236,7 @@ class EIA(object):
         :param category: string or list
         :param filters_to_keep: sting or int or list of strings or ints
         :param filters_to_remove: string or list
-        :return: Returns EIA data series in dictionary form
+        :return: Returns eia data series in dictionary form
         (name, units, frequency, and series ID) based on category ID.
         """
         categories_dict = self.search_by_category(category,
@@ -248,12 +250,12 @@ class EIA(object):
                     categories_dict[series_id]['Series ID'],
                     self.token))
 
-                if ('error' in str(search.json().items())) and \
-                        (search.json()['data']['error'].find(
-                            'invalid series_id') != -1):
-                    values_dict[series_id + " (" +
+                if search.json().get('data').get('error') == \
+                        glob_invalid_series_id:
+                    values_dict[series_id +
+                                " (" +
                                 categories_dict[series_id]['Units'] +
-                                ") "] = \
+                                ") "] =\
                         "No Data Available"
 
                 else:
@@ -277,14 +279,14 @@ class EIA(object):
                         keyword,
                         filters_to_keep=None,
                         filters_to_remove=None,
-                        rows=globrow):
+                        rows=glob_row):
         """
         API Search Data Query - Keyword
         :param keyword: string
         :param filters_to_keep: string or list
         :param filters_to_remove: string or list
         :param rows: string
-        :return: Returns EIA data series in dictionary form
+        :return: Returns eia data series in dictionary form
         (name, units, frequency, and series ID) based on keyword search.
         """
         categories_dict = self.search_by_keyword(keyword,
@@ -301,16 +303,15 @@ class EIA(object):
                     categories_dict[series_id]['Series ID'],
                     self.token))
 
-                if ('error' in str(search.json().items())) and \
-                        (search.json()['data']['error'].find(
-                            'invalid or missing api_key') != -1):
+                if search.json().get('data').get('error') == \
+                        glob_invalid_api_key:
                     error_msg = search.json()['data']['error']
                     raise APIKeyError(error_msg)
 
-                elif ('error' in str(search.json().items())) and \
-                        (search.json()['data']['error'].find(
-                            'invalid series_id') != -1):
-                    values_dict[series_id + " (" +
+                elif search.json().get('data').get('error') == \
+                        glob_invalid_series_id:
+                    values_dict[series_id +
+                                " (" +
                                 categories_dict[series_id]['Units'] +
                                 ") "] = \
                         "No Data Available"
@@ -335,14 +336,14 @@ class EIA(object):
                      date,
                      filters_to_keep=None,
                      filters_to_remove=None,
-                     rows=globrow):
+                     rows=glob_row):
         """
         API Search Data Query - Date Search
         :param date: string
         :param filters_to_keep: string or list
         :param filters_to_remove: string or list
         :param rows: string
-        :return: Returns EIA data series in dictionary form
+        :return: Returns eia data series in dictionary form
         (name, units, frequency, and series ID) based on last update date.
         """
         categories_dict = self.search_by_date(date,
@@ -357,15 +358,13 @@ class EIA(object):
                     categories_dict[series_id]['Series ID'],
                     self.token))
 
-                if ('error' in str(search.json().items())) and \
-                        (search.json()['data']['error'].find(
-                            'invalid or missing api_key') != -1):
+                if search.json().get('data').get('error') == \
+                        glob_invalid_api_key:
                     error_msg = search.json()['data']['error']
                     raise APIKeyError(error_msg)
 
-                elif ('error' in str(search.json().items())) and \
-                        (search.json()['data']['error'].find(
-                            'invalid series_id') != -1):
+                elif search.json().get('data').get('error') == \
+                        glob_invalid_series_id:
                     values_dict[series_id + " (" +
                                 categories_dict[series_id]['Units'] +
                                 ") "] = \
@@ -393,22 +392,18 @@ class EIA(object):
         """
         API Series Query
         :param series: string
-        :return: Returns EIA data series in dictionary form
+        :return: Returns eia data series in dictionary form
         (name, units, frequency, and series ID) based on series ID.
         """
         url_data = 'http://api.eia.gov/series/?series_id={}&api_key={}&out=json'
         values_dict = {}
         search = requests.get(url_data.format(series, self.token))
 
-        if ('error' in str(search.json().items())) and \
-                (search.json()['data']['error'].find(
-                    'invalid or missing api_key') != -1):
+        if search.json().get('data').get('error') == glob_invalid_api_key:
             error_msg = search.json()['data']['error']
             raise APIKeyError(error_msg)
 
-        elif ('error' in str(search.json().items())) and \
-                (search.json()['data']['error'].find(
-                    'invalid series_id') != -1):
+        elif search.json().get('data').get('error') == glob_invalid_series_id:
             error_msg = search.json()['data']['error']
             raise InvalidSeries(error_msg)
 
