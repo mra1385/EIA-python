@@ -1,6 +1,7 @@
 EIA-python
 ======
-A Python 2/3 wrapper for the Energy Information Agency (EIA) API.
+A Python 2/3 wrapper for the Energy Information Agency (EIA) API. Designed to
+return data formatted for easy loading into pandas DataFrame objects.
 
 Installation
 -----
