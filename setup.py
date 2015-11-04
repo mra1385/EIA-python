@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='EIA-python',
-    version='1.11',
+    version='1.12',
     packages=['eia'],
     url='https://github.com/mra1385/EIA-python',
     license='BSD',

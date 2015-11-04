@@ -2,4 +2,3 @@
 setup.py
 eia\__init__.py
 eia\api.py
-eia\eia.py
