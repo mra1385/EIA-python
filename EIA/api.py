@@ -128,7 +128,7 @@ class API(object):
                                 "Your Search with a Child Category.")
 
         if return_list:
-            return categories_dict.keys()
+            return list(categories_dict.keys())
 
         else:
             return categories_dict
@@ -173,7 +173,7 @@ class API(object):
             raise NoResultsError('No Results Found')
 
         if return_list:
-            return categories_dict.keys()
+            return list(categories_dict.keys())
 
         else:
             return categories_dict
@@ -213,7 +213,7 @@ class API(object):
                                                           filters_to_keep,
                                                           filters_to_remove)
             if return_list:
-                return categories_dict.keys()
+                return list(categories_dict.keys())
 
             else:
                 return categories_dict
