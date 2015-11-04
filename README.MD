@@ -34,7 +34,7 @@ examples of how to use the EIA-python module. The module is generally split into
 
 "Series Search" methods are wrappers around the EIA API for searching for series 
 using category IDs (API Category Query), keywords (API Search Data Query - 
-Keyword Search / Pagination on Search / Manipulate Rows Per Page) or dates last 
+Keyword Search / Manipulate Rows Per Page) or dates last 
 updated (API Search Data Query - Date Search). These methods help the user
 find specific series or groups of series from within the EIA data set. The 
 intention is that once the desired series are found using the "Series Search" 
@@ -63,7 +63,6 @@ Series Search:
                                            filters_to_keep=['AEO2015'],
                                            filters_to_remove=['high price'],
                                            rows=1000, 
-                                           page=1,
                                            return_list=False)
     
     for key, value in keyword_search.items():
@@ -88,7 +87,6 @@ Series Search:
                                      filters_to_keep=['Arkansas'],
                                      filters_to_remove=['annual'],
                                      rows=1000, 
-                                     page=1,
                                      return_list=True)
     
     for result in date_search:
@@ -108,8 +106,7 @@ Data Retrieval:
     keyword_search = api.data_by_keyword(keyword=['crude oil', 'price'],
                                          filters_to_keep=['brent'],
                                          filters_to_remove=['AEO2015'],
-                                         rows=1000, 
-                                         page=1)
+                                         rows=1000)
     
     for key,value in keyword_search.items():
         print(key,value)
@@ -132,8 +129,7 @@ Data Retrieval:
                                               TO 2015-01-01T23:59:59Z',
                                    filters_to_keep=['brent'],
                                    filters_to_remove=['AEO2015'],
-                                   rows=1000, 
-                                   page=1)
+                                   rows=1000)
 
     for key,value in date_search.items():
         print(key,value)

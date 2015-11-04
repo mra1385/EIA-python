@@ -1,10 +1,8 @@
 import requests
 
 
-# Global variables used as default params for certain EIA-python1 API queries
-rows_global = 100
-page_global = 1
-
+# global variable
+globrow = 100
 
 class APIKeyError(Exception):
     pass
@@ -19,6 +17,10 @@ class DateFormatError(Exception):
 
 
 class InvalidSeries(Exception):
+    pass
+
+
+class UndefinedError(Exception):
     pass
 
 
@@ -106,10 +108,14 @@ class EIA(object):
                                                           filters_to_keep,
                                                           filters_to_remove)
 
-        elif ('childcategories' in str(search.json().items())) and \
-                (len(search.json()['category']['childcategories']) > 0):
-                raise NoResultsError("No Child Series Found. Narrow Your Search"
-                                     " By Choosing a More Specific Category ID")
+        elif 'No result found' in str(search.json().items()):
+                raise NoResultsError("No Result Found. Try A Different "
+                                     "Category ID")
+
+        elif ('childcategories' not in str(search.json().items())) and \
+                (len(search.json()['category']['childcategories']) == 0):
+                raise NoResultsError("No Results Found.")
+
         if return_list is True:
             categories_lst = []
             for k in categories_dict:
@@ -123,17 +129,14 @@ class EIA(object):
                           keyword=None,
                           filters_to_keep=None,
                           filters_to_remove=None,
-                          rows=rows_global,
-                          page=page_global,
+                          rows=globrow,
                           return_list=False):
         """
-        API Search Data Query - Keyword / Pagination on Search /
-        Manipulate Rows Per Page
+        API Search Data Query - Keyword
         :param keyword: list or string
         :param filters_to_keep: list or string
         :param filters_to_remove: list or string
-        :param rows: string or int
-        :param page: string or int
+        :param rows: string
         :param return_list: boolean
         :return: If return_list is false, returns a dictionary of search results
         (name, units, frequency, and series ID) based on keyword.
@@ -141,9 +144,9 @@ class EIA(object):
         """
         if type(keyword) == list: keyword = '+'.join(keyword)
         search_url = 'http://api.eia.gov/search/?search_term=name&' \
-                     'search_value="{}"&rows_per_page={}&page_num={}'
+                     'search_value="{}"&rows_per_page={}'
         categories_dict = {}
-        search = requests.get(search_url.format(keyword, rows, page))
+        search = requests.get(search_url.format(keyword, rows))
 
         if ('response' in str(search.json())) and \
                 (len(search.json()['response']['docs']) > 0):
@@ -174,25 +177,23 @@ class EIA(object):
                        date,
                        filters_to_keep=None,
                        filters_to_remove=None,
-                       rows=rows_global,
-                       page=page_global,
+                       rows=globrow,
                        return_list=False):
         """
         API Search Data Query - Date Search
         :param date: string
         :param filters_to_keep: string or list
         :param filters_to_remove: string or list
-        :param rows: string or int
-        :param page: string or int
+        :param rows: string
         :param return_list: boolean
         :return: If return_list is false, returns a dictionary of search results
         (name, units, frequency, and series ID) based on last update date.
         If return_list is true, returns a list of search results (name, only).
         """
         search_url = 'http://api.eia.gov/search/?search_term=last_updated&' \
-                     'search_value=[{}]&rows_per_page={}&page_num={}'
+                     'search_value=[{}]&rows_per_page={}'
         categories_dict = {}
-        search = requests.get(search_url.format(date, rows, page))
+        search = requests.get(search_url.format(date, rows))
         if ('response' in str(search.json()) and
                 (len(search.json()['response']['docs']) > 0)):
 
@@ -276,23 +277,21 @@ class EIA(object):
                         keyword,
                         filters_to_keep=None,
                         filters_to_remove=None,
-                        rows=rows_global,
-                        page=page_global):
+                        rows=globrow):
         """
         API Search Data Query - Keyword
         :param keyword: string
         :param filters_to_keep: string or list
         :param filters_to_remove: string or list
-        :param rows: string or int
-        :param page: string or int
+        :param rows: string
         :return: Returns EIA data series in dictionary form
         (name, units, frequency, and series ID) based on keyword search.
         """
         categories_dict = self.search_by_keyword(keyword,
                                                  filters_to_keep,
                                                  filters_to_remove,
-                                                 rows,
-                                                 page)
+                                                 rows)
+
         url_data = 'http://api.eia.gov/series/?series_id={}&api_key={}&out=json'
         values_dict = {}
 
@@ -336,23 +335,20 @@ class EIA(object):
                      date,
                      filters_to_keep=None,
                      filters_to_remove=None,
-                     rows=rows_global,
-                     page=page_global):
+                     rows=globrow):
         """
         API Search Data Query - Date Search
         :param date: string
         :param filters_to_keep: string or list
         :param filters_to_remove: string or list
-        :param rows: string or int
-        :param page: string or int
+        :param rows: string
         :return: Returns EIA data series in dictionary form
         (name, units, frequency, and series ID) based on last update date.
         """
         categories_dict = self.search_by_date(date,
                                               filters_to_keep,
                                               filters_to_remove,
-                                              rows,
-                                              page)
+                                              rows)
         url_data = 'http://api.eia.gov/series/?series_id={}&api_key={}&out=json'
         values_dict = {}
         if categories_dict is not None:
