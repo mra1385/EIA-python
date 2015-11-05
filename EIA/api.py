@@ -5,8 +5,9 @@ import requests
 glob_row = 100
 
 # global variables with error messages from eia API
-glob_invalid_series_id = 'invalid series_id. For key registration, documentation, ' \
-                    'and examples see http://www.eia.gov/developer/'
+glob_invalid_series_id = 'invalid series_id. For key registration, ' \
+                         'documentation, and examples see ' \
+                         'http://www.eia.gov/developer/'
 
 glob_invalid_api_key = 'invalid or missing api_key. For key registration, ' \
                   'documentation, and examples see ' \
@@ -122,12 +123,12 @@ class API(object):
                                                           filters_to_remove)
 
         elif search.json().get('data') and \
-            search.json().get('data').get('error') == 'No result found.':
+                search.json().get('data').get('error') == 'No result found.':
             raise NoResultsError("No Result Found. Try A Different Category ID")
 
-        elif (search.json().get('category') and \
-                  search.json().get('category').get('childcategories')) and \
-                (not search.json().get('category').get('childseries')):
+        elif search.json().get('category') and \
+                search.json().get('category').get('childcategories') and \
+                not search.json().get('category').get('childseries'):
             raise BroadCategory("Category ID is Too Broad. Try Narrowing "
                                 "Your Search with a Child Category.")
 
