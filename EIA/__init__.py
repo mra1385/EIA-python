@@ -1,1 +1,2 @@
-from EIA.api import API
+from eia.api import API
+
