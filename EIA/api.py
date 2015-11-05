@@ -7,11 +7,11 @@ glob_row = 100
 # global variables with error messages from EIA API
 glob_invalid_series_id = 'invalid series_id. For key registration, ' \
                          'documentation, and examples see ' \
-                         'http://www.EIA.gov/developer/'
+                         'http://www.eia.gov/developer/'
 
 glob_invalid_api_key = 'invalid or missing api_key. For key registration, ' \
-                  'documentation, and examples see ' \
-                  'http://www.EIA.gov/developer/'
+                       'documentation, and examples see ' \
+                       'http://www.eia.gov/developer/'
 
 
 class APIKeyError(Exception):
@@ -308,11 +308,11 @@ class API(object):
                 search = requests.get(url_data.format(
                     categories_dict[series_id]['Series ID'],
                     self.token))
-
+                print(search.json().get('data').get('error'))
                 if search.json().get('data') and \
                         search.json().get('data').get('error') == \
                         glob_invalid_api_key:
-                    error_msg = search.json()['data']['error']
+                    error_msg = search.json().get('data').get('error')
                     raise APIKeyError(error_msg)
 
                 elif search.json().get('data') and \
@@ -369,7 +369,7 @@ class API(object):
                 if search.json().get('data') and \
                         search.json().get('data').get('error') == \
                         glob_invalid_api_key:
-                    error_msg = search.json()['data']['error']
+                    error_msg = search.json().get('data').get('error')
                     raise APIKeyError(error_msg)
 
                 elif search.json().get('data') and \
@@ -408,12 +408,12 @@ class API(object):
         url_data = 'http://api.EIA.gov/series/?series_id={}&api_key={}&out=json'
         values_dict = {}
         search = requests.get(url_data.format(series, self.token))
-
-        if search.json().get('data') \
-                and search.json().get('data').get('error') == \
+        print(search.json().get('data').get('error'))
+        if search.json().get('data') and \
+                search.json().get('data').get('error') == \
                 glob_invalid_api_key:
-                error_msg = search.json()['data']['error']
-                raise APIKeyError(error_msg)
+            error_msg = search.json().get('data').get('error')
+            raise APIKeyError(error_msg)
 
         elif search.json().get('data') \
                 and search.json().get('data').get('error') == \
