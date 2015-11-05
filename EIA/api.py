@@ -103,7 +103,9 @@ class API(object):
         search_url = 'http://api.eia.gov/category/?api_key={}&category_id={}'
         categories_dict = {}
         search = requests.get(search_url.format(self.token, category))
-        if search.json().get('data').get('error') == glob_invalid_api_key:
+        if search.json().get('data') \
+                and search.json().get('data').get('error') == \
+                glob_invalid_api_key:
             error_msg = search.json()['data']['error']
             raise APIKeyError(error_msg)
 
@@ -119,10 +121,12 @@ class API(object):
                                                           filters_to_keep,
                                                           filters_to_remove)
 
-        elif search.json().get('data').get('error') == 'No result found.':
+        elif search.json().get('data') and \
+            search.json().get('data').get('error') == 'No result found.':
             raise NoResultsError("No Result Found. Try A Different Category ID")
 
-        elif (search.json().get('category').get('childcategories')) and \
+        elif (search.json().get('category') and \
+                  search.json().get('category').get('childcategories')) and \
                 (not search.json().get('category').get('childseries')):
             raise BroadCategory("Category ID is Too Broad. Try Narrowing "
                                 "Your Search with a Child Category.")
@@ -250,7 +254,8 @@ class API(object):
                     categories_dict[series_id]['Series ID'],
                     self.token))
 
-                if search.json().get('data').get('error') == \
+                if search.json().get('data') and \
+                        search.json().get('data').get('error') == \
                         glob_invalid_series_id:
                     values_dict[series_id +
                                 " (" +
@@ -303,12 +308,14 @@ class API(object):
                     categories_dict[series_id]['Series ID'],
                     self.token))
 
-                if search.json().get('data').get('error') == \
+                if search.json().get('data') and \
+                        search.json().get('data').get('error') == \
                         glob_invalid_api_key:
                     error_msg = search.json()['data']['error']
                     raise APIKeyError(error_msg)
 
-                elif search.json().get('data').get('error') == \
+                elif search.json().get('data') and \
+                        search.json().get('data').get('error') == \
                         glob_invalid_series_id:
                     values_dict[series_id +
                                 " (" +
@@ -358,12 +365,14 @@ class API(object):
                     categories_dict[series_id]['Series ID'],
                     self.token))
 
-                if search.json().get('data').get('error') == \
+                if search.json().get('data') and \
+                        search.json().get('data').get('error') == \
                         glob_invalid_api_key:
                     error_msg = search.json()['data']['error']
                     raise APIKeyError(error_msg)
 
-                elif search.json().get('data').get('error') == \
+                elif search.json().get('data') and \
+                        search.json().get('data').get('error') == \
                         glob_invalid_series_id:
                     values_dict[series_id + " (" +
                                 categories_dict[series_id]['Units'] +
@@ -399,13 +408,17 @@ class API(object):
         values_dict = {}
         search = requests.get(url_data.format(series, self.token))
 
-        if search.json().get('data').get('error') == glob_invalid_api_key:
-            error_msg = search.json()['data']['error']
-            raise APIKeyError(error_msg)
+        if search.json().get('data') \
+                and search.json().get('data').get('error') == \
+                glob_invalid_api_key:
+                error_msg = search.json()['data']['error']
+                raise APIKeyError(error_msg)
 
-        elif search.json().get('data').get('error') == glob_invalid_series_id:
-            error_msg = search.json()['data']['error']
-            raise InvalidSeries(error_msg)
+        elif search.json().get('data') \
+                and search.json().get('data').get('error') == \
+                glob_invalid_series_id:
+                error_msg = search.json()['data']['error']
+                raise InvalidSeries(error_msg)
 
         else:
             lst_dates = [x[0][0:4] + " " + x[0][4:] + " " + x[0][6:8]
