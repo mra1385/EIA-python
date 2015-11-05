@@ -4,14 +4,14 @@ import requests
 # global variable for default row count parameter
 glob_row = 100
 
-# global variables with error messages from eia API
+# global variables with error messages from EIA API
 glob_invalid_series_id = 'invalid series_id. For key registration, ' \
                          'documentation, and examples see ' \
-                         'http://www.eia.gov/developer/'
+                         'http://www.EIA.gov/developer/'
 
 glob_invalid_api_key = 'invalid or missing api_key. For key registration, ' \
                   'documentation, and examples see ' \
-                  'http://www.eia.gov/developer/'
+                  'http://www.EIA.gov/developer/'
 
 
 class APIKeyError(Exception):
@@ -41,9 +41,9 @@ class UndefinedError(Exception):
 class API(object):
     def __init__(self, token):
         """
-        Initialise the eia object:
+        Initialise the EIA object:
         :param token: string
-        :return: eia object
+        :return: EIA object
         """
         self.token = token
 
@@ -101,7 +101,7 @@ class API(object):
         (name, units, frequency, and series ID) based on category_id.
         If return_list is true, returns a list of search results (name, only).
         """
-        search_url = 'http://api.eia.gov/category/?api_key={}&category_id={}'
+        search_url = 'http://api.EIA.gov/category/?api_key={}&category_id={}'
         categories_dict = {}
         search = requests.get(search_url.format(self.token, category))
         if search.json().get('data') \
@@ -111,7 +111,7 @@ class API(object):
             raise APIKeyError(error_msg)
 
         elif (search.json().get('category')) and \
-                (search.json()['category']['childseries']):
+                (search.json().get('category').get('childseries')):
             for k in search.json()['category']['childseries']:
                 categories_dict[k['name']] = {}
                 categories_dict[k['name']]['Units'] = k['units']
@@ -156,13 +156,13 @@ class API(object):
         If return_list is true, returns a list of search results (name, only).
         """
         if isinstance(keyword, list) == list: keyword = '+'.join(keyword)
-        search_url = 'http://api.eia.gov/search/?search_term=name&' \
+        search_url = 'http://api.EIA.gov/search/?search_term=name&' \
                      'search_value="{}"&rows_per_page={}'
         categories_dict = {}
         search = requests.get(search_url.format(keyword, rows))
 
         if (search.json().get('response')) and \
-                (search.json()['response']['docs']):
+                (search.json().get('response').get('docs')):
             for k in search.json()['response']['docs']:
                 categories_dict[k['name']] = {}
                 categories_dict[k['name']]['Units'] = k['units']
@@ -200,12 +200,12 @@ class API(object):
         (name, units, frequency, and series ID) based on last update date.
         If return_list is true, returns a list of search results (name, only).
         """
-        search_url = 'http://api.eia.gov/search/?search_term=last_updated&' \
+        search_url = 'http://api.EIA.gov/search/?search_term=last_updated&' \
                      'search_value=[{}]&rows_per_page={}'
         categories_dict = {}
         search = requests.get(search_url.format(date, rows))
         if (search.json().get('response')) and \
-                (search.json()['response']['docs']):
+                (search.json().get('response').get('docs')):
 
             for k in search.json()['response']['docs']:
                 categories_dict[k['name']] = {}
@@ -229,7 +229,7 @@ class API(object):
                                   "'2014-01-01T00:00:00Z TO "
                                   "2015-01-01T23:59:59Z'")
 
-        elif not search.json()['response']['docs']:
+        elif not search.json().get('response').get('docs'):
             raise NoResultsError('No Results Found')
 
     def data_by_category(self,
@@ -241,13 +241,13 @@ class API(object):
         :param category: string or list
         :param filters_to_keep: sting or int or list of strings or ints
         :param filters_to_remove: string or list
-        :return: Returns eia data series in dictionary form
+        :return: Returns EIA data series in dictionary form
         (name, units, frequency, and series ID) based on category ID.
         """
         categories_dict = self.search_by_category(category,
                                                   filters_to_keep,
                                                   filters_to_remove)
-        url_data = 'http://api.eia.gov/series/?series_id={}&api_key={}&out=json'
+        url_data = 'http://api.EIA.gov/series/?series_id={}&api_key={}&out=json'
         values_dict = {}
         if categories_dict is not None:
             for series_id in categories_dict.keys():
@@ -292,7 +292,7 @@ class API(object):
         :param filters_to_keep: string or list
         :param filters_to_remove: string or list
         :param rows: string
-        :return: Returns eia data series in dictionary form
+        :return: Returns EIA data series in dictionary form
         (name, units, frequency, and series ID) based on keyword search.
         """
         categories_dict = self.search_by_keyword(keyword,
@@ -300,7 +300,7 @@ class API(object):
                                                  filters_to_remove,
                                                  rows)
 
-        url_data = 'http://api.eia.gov/series/?series_id={}&api_key={}&out=json'
+        url_data = 'http://api.EIA.gov/series/?series_id={}&api_key={}&out=json'
         values_dict = {}
 
         if categories_dict is not None:
@@ -351,14 +351,14 @@ class API(object):
         :param filters_to_keep: string or list
         :param filters_to_remove: string or list
         :param rows: string
-        :return: Returns eia data series in dictionary form
+        :return: Returns EIA data series in dictionary form
         (name, units, frequency, and series ID) based on last update date.
         """
         categories_dict = self.search_by_date(date,
                                               filters_to_keep,
                                               filters_to_remove,
                                               rows)
-        url_data = 'http://api.eia.gov/series/?series_id={}&api_key={}&out=json'
+        url_data = 'http://api.EIA.gov/series/?series_id={}&api_key={}&out=json'
         values_dict = {}
         if categories_dict is not None:
             for series_id in categories_dict.keys():
@@ -402,10 +402,10 @@ class API(object):
         """
         API Series Query
         :param series: string
-        :return: Returns eia data series in dictionary form
+        :return: Returns EIA data series in dictionary form
         (name, units, frequency, and series ID) based on series ID.
         """
-        url_data = 'http://api.eia.gov/series/?series_id={}&api_key={}&out=json'
+        url_data = 'http://api.EIA.gov/series/?series_id={}&api_key={}&out=json'
         values_dict = {}
         search = requests.get(url_data.format(series, self.token))
 
