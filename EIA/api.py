@@ -308,7 +308,6 @@ class API(object):
                 search = requests.get(url_data.format(
                     categories_dict[series_id]['Series ID'],
                     self.token))
-                print(search.json().get('data').get('error'))
                 if search.json().get('data') and \
                         search.json().get('data').get('error') == \
                         glob_invalid_api_key:
