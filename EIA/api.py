@@ -164,10 +164,10 @@ class API(object):
         if (search.json().get('response')) and \
                 (search.json().get('response').get('docs')):
             for k in search.json()['response']['docs']:
-                categories_dict[k['name']] = {}
-                categories_dict[k['name']]['Units'] = k['units']
-                categories_dict[k['name']]['Frequency'] = k['frequency']
-                categories_dict[k['name']]['Series ID'] = k['series_id']
+                categories_dict[k['name'][0]] = {}
+                categories_dict[k['name'][0]]['Units'] = k['units']
+                categories_dict[k['name'][0]]['Frequency'] = k['frequency']
+                categories_dict[k['name'][0]]['Series ID'] = k['series_id']
             if filters_to_keep is not None or filters_to_remove is not None:
                 categories_dict = self._filter_categories(categories_dict,
                                                           filters_to_keep,
@@ -208,10 +208,10 @@ class API(object):
                 (search.json().get('response').get('docs')):
 
             for k in search.json()['response']['docs']:
-                categories_dict[k['name']] = {}
-                categories_dict[k['name']]['Units'] = k['units']
-                categories_dict[k['name']]['Frequency'] = k['frequency']
-                categories_dict[k['name']]['Series ID'] = k['series_id']
+                categories_dict[k['name'][0]] = {}
+                categories_dict[k['name'][0]]['Units'] = k['units']
+                categories_dict[k['name'][0]]['Frequency'] = k['frequency']
+                categories_dict[k['name'][0]]['Series ID'] = k['series_id']
 
             if filters_to_keep is not None or filters_to_remove is not None:
                 categories_dict = self._filter_categories(categories_dict,
@@ -431,3 +431,4 @@ class API(object):
                         ")"] = \
                 dates_values_dict
             return values_dict
+
