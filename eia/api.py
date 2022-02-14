@@ -101,7 +101,7 @@ class API(object):
         (name, units, frequency, and series ID) based on category_id.
         If return_list is true, returns a list of search results (name, only).
         """
-        search_url = 'http://api.eia.gov/category/?api_key={}&category_id={}'
+        search_url = 'https://api.eia.gov/category/?api_key={}&category_id={}'
         categories_dict = {}
         search = requests.get(search_url.format(self.token, category))
         if search.json().get('data') \
@@ -156,7 +156,7 @@ class API(object):
         If return_list is true, returns a list of search results (name, only).
         """
         if isinstance(keyword, list) == list: keyword = '+'.join(keyword)
-        search_url = 'http://api.eia.gov/search/?search_term=name&' \
+        search_url = 'https://api.eia.gov/search/?search_term=name&' \
                      'search_value="{}"&rows_per_page={}'
         categories_dict = {}
         search = requests.get(search_url.format(keyword, rows))
@@ -200,7 +200,7 @@ class API(object):
         (name, units, frequency, and series ID) based on last update date.
         If return_list is true, returns a list of search results (name, only).
         """
-        search_url = 'http://api.eia.gov/search/?search_term=last_updated&' \
+        search_url = 'https://api.eia.gov/search/?search_term=last_updated&' \
                      'search_value=[{}]&rows_per_page={}'
         categories_dict = {}
         search = requests.get(search_url.format(date, rows))
@@ -247,7 +247,7 @@ class API(object):
         categories_dict = self.search_by_category(category,
                                                   filters_to_keep,
                                                   filters_to_remove)
-        url_data = 'http://api.eia.gov/series/?series_id={}&api_key={}&out=json'
+        url_data = 'https://api.eia.gov/series/?series_id={}&api_key={}&out=json'
         values_dict = {}
         if categories_dict is not None:
             for series_id in categories_dict.keys():
@@ -300,7 +300,7 @@ class API(object):
                                                  filters_to_remove,
                                                  rows)
 
-        url_data = 'http://api.eia.gov/series/?series_id={}&api_key={}&out=json'
+        url_data = 'https://api.eia.gov/series/?series_id={}&api_key={}&out=json'
         values_dict = {}
 
         if categories_dict is not None:
@@ -357,7 +357,7 @@ class API(object):
                                               filters_to_keep,
                                               filters_to_remove,
                                               rows)
-        url_data = 'http://api.eia.gov/series/?series_id={}&api_key={}&out=json'
+        url_data = 'https://api.eia.gov/series/?series_id={}&api_key={}&out=json'
         values_dict = {}
         if categories_dict is not None:
             for series_id in categories_dict.keys():
@@ -404,7 +404,7 @@ class API(object):
         :return: Returns eia data series in dictionary form
         (name, units, frequency, and series ID) based on series ID.
         """
-        url_data = 'http://api.eia.gov/series/?series_id={}&api_key={}&out=json'
+        url_data = 'https://api.eia.gov/series/?series_id={}&api_key={}&out=json'
         values_dict = {}
         search = requests.get(url_data.format(series, self.token))
         if search.json().get('data') and \
